@@ -1,0 +1,29 @@
+void main() {
+  final xmlString = '''
+    <?xml version="1.0"?>
+    <items>
+      <item id="1">
+        <name>Apple</name>
+        <price>0.99</price>
+      </item>
+      <item id="2">
+        <name>Banana</name>
+        <price>0.79</price>
+      </item>
+    </items>
+  ''';
+
+  final document = XmlDocument.parse(xmlString);
+  final root = document.rootElement;
+
+  final ports = <Port>[];
+  for (var port in root.children) {
+    final dir = item.getAttribute('id');
+    final name = item.findElements('name').first.text;
+    final price = double.parse(item.findElements('price').first.text);
+    items.add(Item(id, name, price));
+  }
+
+  final itemsObject = Items(items);
+}
+
