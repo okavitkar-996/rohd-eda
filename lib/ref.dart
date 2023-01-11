@@ -3,19 +3,18 @@ import 'dart:io';
 import 'package:xml/xml.dart';
 import 'package:xml2json/xml2json.dart';
 
-class file_ty {
-  String name = "./";
-  String fileType = "None";
-  String logicalName = "None";
-}
+class Port {
+  String name = "N/A";
+  String direction = "N/A";
+  String left_point = "N/A";
+  String right_point = "N/A";
 
-class Fileset {
-  String name = "./";
-  String type = "None";
-  String dependancty = "None";
-  //String library = "None";
-  //String version = "0";
-
+  Port(String a, String b, String c, String d) {
+    this.name = a;
+    this.direction = b;
+    this.left_point = c;
+    this.right_point = d;
+  }
 }
 
 class Component {
@@ -24,60 +23,124 @@ class Component {
   String library = "None";
   String version = "0";
 
-  Component(String x, String y, String q, String w) {
+  var null_name = "None";
+  var direct = "None";
+  var left = "";
+  var right = "";
+  var ports;
+  Map fileSet = {};
+
+  Component(String x, String y, String q, String w, List<Port> ports, Map b) {
     this.name = x;
     this.vendor = y;
     this.library = q;
     this.version = w;
+    this.ports = ports;
+    this.fileSet = b;
   }
 }
 
 void ref(String file) {
+  Map directions = {"in": "input", "out": "output"};
+
   File xml_file = File(file);
 
   final xmlString = xml_file.readAsStringSync();
   final document = XmlDocument.parse(xmlString);
-  //print(document.runtimeType);
+
   final vendor = document.findAllElements('ipxact:vendor');
   final library = document.findAllElements('ipxact:library');
   final name = document.findAllElements('ipxact:name');
   final version = document.findAllElements('ipxact:version');
 
-  //List<file_ty>;
-  Component bb = new Component(name.first.text, vendor.first.text,
-      library.first.text, version.first.text);
+  var ports = document.findAllElements('ipxact:port');
 
-  final ports = document.findAllElements('ipxact:port');
-  //print(ports.first.runtimeType);
+  var portss = ports.toString();
+  var null_name = "None";
+  var direct = "None";
+  var left = "N/A";
+  var right = "N/A";
+  List<Port> ports_xml =
+      List.filled(ports.length, Port(null_name, direct, left, right));
 
-  final fileSets = document.findAllElements('ipxact:fileSet');
+  for (var i = 0; i < ports.length; i = i + 1) {
+    var name = ports.elementAt(i).getElement('ipxact:name')?.text;
 
-  var myList = List<Fileset>;
-  //print(fileSets.runtimeType);
-  for (var fs in fileSets) {
-    //print(fs.runtimeType);
-    var xml2json = Xml2Json();
+    if (name != null) {
+      ports_xml.elementAt(i).name = name;
+    }
+    // = null_name;
 
-    Fileset fst = new Fileset();
-    // var fsxml = ET.tostring(fs);
-    String fsxml = fs.toXmlString();
+    var wire = ports.elementAt(i).getElement('ipxact:wire');
+    var direction = wire?.getElement('ipxact:direction')?.innerText;
 
-    xml2json.parse(fs.outerXml);
-    var xmlMap1 = xml2json.toParker();
-    print("Parker");
-    print(xmlMap1.runtimeType);
-    var xmlMap2 = xml2json.toGData();
-    print("GData");
-    print(xmlMap2);
+    if (direction != null) {
+      ports_xml.elementAt(i).direction = direction;
+    }
 
-    var xmlMapO = xml2json.toGData();
-    print("BadgerFish");
-    print(xmlMapO);
+    var left = wire
+        ?.getElement('ipxact:vectors')
+        ?.getElement('ipxact:vector')
+        ?.getElement('ipxact:left')
+        ?.innerText;
+    //var ll;
+    if (left != null) {
+      ports_xml.elementAt(i).left_point = left;
+    }
 
-    //Map valueMap<String, dynamic> = json.decode(xmlMap1);
-    //print(valueMap.runtimeType);
-    //Map<String, dynamic> xmlMap = xml2json.toMap();
-    //Map valueMap = json.decode(xmlMap2);
-    //print(valueMap);
+    var right = wire
+        ?.getElement('ipxact:vectors')
+        ?.getElement('ipxact:vector')
+        ?.getElement('ipxact:right')
+        ?.innerText;
+    //var rr;
+//var ll;
+    if (right != null) {
+      ports_xml.elementAt(i).right_point = (right as String);
+    }
+
+    //  rr = right;
+
   }
+  // var xml2json0 = Xml2Json();
+  //var pp = ports.findAllElements('ipxact:port');
+//  print(pp.length);
+  // for (var i in pp) {
+  //  print(i);
+  //}
+
+//  xml2json0.parse(ports.toString());
+//  var xmlMapP = xml2json0.toBadgerfish();
+//  Map portMap = json.decode(xmlMapP);
+
+//  var ap = portMap["ipxact:ports"];
+
+//  print(portMap);
+
+  /*
+  for (var i in portMap.values) {
+    print(i);
+    print("\n");
+  }
+
+  final fileSets = document.findAllElements('ipxact:fileSets');
+
+  var xml2json = Xml2Json();
+
+  xml2json.parse(fileSets.toString());
+  var xmlMapO = xml2json.toGData();
+
+  Map valueMap = json.decode(xmlMapO);
+
+  var files = xmlMapO;
+
+  
+  print(files);
+  for (var fle in files.values) {
+  print(fle);
+  print("\n");
+  }
+*/
+  Component bb = new Component(name.first.text, vendor.first.text,
+      library.first.text, version.first.text, ports_xml, {});
 }

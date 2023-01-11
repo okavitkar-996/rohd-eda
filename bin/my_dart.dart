@@ -4,14 +4,7 @@ import 'dart:io';
 import 'package:my_dart/ref.dart' as referance;
 import 'package:my_dart/my_dart.dart' as my;
 import 'package:xml2json/xml2json.dart';
-
-class Port {
-  final String name;
-  final String dir;
-  final double price;
-
-  Port(this.name, this.dir, this.price);
-}
+import 'dart:io';
 
 void main() {
   String ff = './xml/unitA.xml';
